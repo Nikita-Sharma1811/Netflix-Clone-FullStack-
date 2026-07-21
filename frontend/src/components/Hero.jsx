@@ -5,13 +5,25 @@ function Hero({ movie }) {
 
     if (!movie) return null;
 
+    const getEmbedUrl = (url) => {
+        if (!url) return "";
+        let embed = url;
+        if (url.includes("youtube.com/watch?v=")) {
+            embed = url.replace("watch?v=", "embed/");
+        } else if (url.includes("youtu.be/")) {
+            const id = url.split("youtu.be/")[1]?.split("?")[0];
+            embed = `https://www.youtube.com/embed/${id}`;
+        }
+        return embed.includes("?") ? `${embed}&autoplay=1` : `${embed}?autoplay=1`;
+    };
+
     return (
         <div className="hero">
             {playTrailer ? (
                 <iframe
                     width="100%"
                     height="100%"
-                    src={`${movie.trailer}?autoplay=1`}
+                    src={getEmbedUrl(movie.trailer)}
                     title={movie.title}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

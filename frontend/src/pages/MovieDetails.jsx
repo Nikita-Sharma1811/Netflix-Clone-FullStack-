@@ -93,43 +93,43 @@ function MovieDetails() {
 
 
 
+    const getEmbedUrl = (url) => {
+        if (!url) return "";
+        if (url.includes("youtube.com/watch?v=")) {
+            return url.replace("watch?v=", "embed/");
+        }
+        if (url.includes("youtu.be/")) {
+            const id = url.split("youtu.be/")[1]?.split("?")[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        return url;
+    };
+
     // Add Review
     const handleReview = async () => {
-
-
         if (!comment.trim()) {
-
             alert("Please write a review");
-
             return;
-
         }
 
-
         try {
-
+            const user = JSON.parse(localStorage.getItem("user") || "null");
+            const userName = user?.name || "User";
 
             const response = await API.post(
                 `/movies/review/${id}`,
                 {
-                    user: "User",
+                    user: userName,
                     comment,
                     stars: 5
                 }
             );
 
-
             setMovie(response.data);
-
             setComment("");
-
-
         } catch (error) {
-
             console.log(error);
-
         }
-
     };
 
 
@@ -212,7 +212,7 @@ function MovieDetails() {
                     <iframe
                         width="100%"
                         height="450"
-                        src={movie.trailer}
+                        src={getEmbedUrl(movie.trailer)}
                         title={movie.title}
                         frameBorder="0"
                         allowFullScreen

@@ -6,16 +6,13 @@ function Profile(){
     const navigate = useNavigate();
 
     const [user] = useState(
-        JSON.parse(localStorage.getItem("user"))
+        JSON.parse(localStorage.getItem("user") || "null")
     );
 
-
     const handleLogout = () => {
-
         localStorage.removeItem("user");
-
+        localStorage.removeItem("token");
         navigate("/login");
-
     };
 
 

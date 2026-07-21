@@ -5,32 +5,24 @@ function Watchlist() {
 
     const [movies, setMovies] = useState([]);
 
-    const user = JSON.parse(localStorage.getItem("user"));
-
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
     useEffect(() => {
-
-        fetchWatchlist();
-
+        if (user && user._id) {
+            fetchWatchlist();
+        }
     }, []);
 
-
     const fetchWatchlist = async () => {
-
+        if (!user || !user._id) return;
         try {
-
             const response = await API.get(
                 `/movies/watchlist/${user._id}`
             );
-
             setMovies(response.data);
-
         } catch (error) {
-
             console.log(error);
-
         }
-
     };
 
 

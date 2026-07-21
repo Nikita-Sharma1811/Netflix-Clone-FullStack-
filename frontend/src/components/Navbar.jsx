@@ -6,66 +6,44 @@ function Navbar() {
     const [search, setSearch] = useState("");
 
     const [user, setUser] = useState(
-        JSON.parse(localStorage.getItem("user"))
+        JSON.parse(localStorage.getItem("user") || "null")
     );
 
     const navigate = useNavigate();
 
-
     // Check login status
     useEffect(() => {
-
         const checkUser = () => {
-
             setUser(
-                JSON.parse(localStorage.getItem("user"))
+                JSON.parse(localStorage.getItem("user") || "null")
             );
-
         };
-
 
         window.addEventListener(
             "storage",
             checkUser
         );
 
-
         return () => {
-
             window.removeEventListener(
                 "storage",
                 checkUser
             );
-
         };
-
-
     }, []);
 
-
-
     const handleSearch = (e) => {
-
         if(e.key === "Enter" && search.trim()){
-
             navigate(`/search?query=${search}`);
-
             setSearch("");
-
         }
-
     };
 
-
-
     const handleLogout = () => {
-
         localStorage.removeItem("user");
-
+        localStorage.removeItem("token");
         setUser(null);
-
         navigate("/login");
-
     };
 
 
