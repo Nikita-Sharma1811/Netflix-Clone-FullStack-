@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://nikitash1811_db_user:nikita@cluster0.xbsgbtc.mongodb.net/");
+    await mongoose.connect("mongodb://127.0.0.1:27017/netflixClone");
 
     console.log("✅ MongoDB Connected");
   } catch (error) {
