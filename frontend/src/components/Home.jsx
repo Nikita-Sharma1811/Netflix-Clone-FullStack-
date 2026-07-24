@@ -6,13 +6,19 @@ import Hero from "../components/Hero";
 import MovieCard from "../components/MovieCard";
 import Footer from "../components/Footer";
 
+
 function Home() {
 
     const [movies, setMovies] = useState([]);
 
+
     useEffect(() => {
+
         fetchMovies();
+
     }, []);
+
+
 
     const fetchMovies = async () => {
 
@@ -30,39 +36,188 @@ function Home() {
 
     };
 
+
+
+    // Category filter
+    const getCategoryMovies = (category) => {
+
+        return movies.filter(movie =>
+            movie.category?.toLowerCase().includes(category)
+        );
+
+    };
+
+
+
+    // Trending
+    const trendingMovies = movies.filter(movie =>
+        movie.isTrending
+    );
+
+
+
+    // Top Rated
+    const topRatedMovies = [...movies].sort(
+        (a, b) => b.rating - a.rating
+    );
+
+
+
+    const categories = [
+
+        {
+            title: "🔥 Trending Now",
+            movies: trendingMovies
+        },
+
+
+        {
+            title: "🎬 Popular on Netflix",
+            movies: movies
+        },
+
+
+        {
+            title: "🇺🇸 Hollywood Movies",
+            movies: getCategoryMovies("hollywood")
+        },
+
+
+        {
+            title: "🇮🇳 Bollywood Movies",
+            movies: getCategoryMovies("bollywood")
+        },
+
+
+        {
+            title: "💥 Action Movies",
+            movies: getCategoryMovies("action")
+        },
+
+
+        {
+            title: "😂 Comedy Movies",
+            movies: getCategoryMovies("comedy")
+        },
+
+
+        {
+            title: "💕 Romance Movies",
+            movies: getCategoryMovies("romance")
+        },
+
+
+        {
+            title: "👻 Horror Movies",
+            movies: getCategoryMovies("horror")
+        },
+
+
+        {
+            title: "🚀 Sci-Fi Movies",
+            movies: getCategoryMovies("sci")
+        },
+
+
+        {
+            title: "🎭 Drama Movies",
+            movies: getCategoryMovies("drama")
+        },
+
+
+        {
+            title: "🔪 Thriller Movies",
+            movies: getCategoryMovies("thriller")
+        },
+
+
+        {
+            title: "⭐ Top Rated Movies",
+            movies: topRatedMovies
+        }
+
+    ];
+
+
+
     return (
 
         <>
 
+
             <Navbar />
 
-            <Hero movie={movies[0]} />
+
+            <Hero />
+
+
 
             <div className="home">
 
-                <h2>Trending Now</h2>
 
-                <div className="movie-grid">
+                {
+                    categories.map((category, index) => (
 
-                    {movies.map((movie) => (
 
-                        <MovieCard
-                            key={movie._id}
-                            movie={movie}
-                        />
+                        category.movies.length > 0 && (
 
-                    ))}
 
-                </div>
+                            <section key={index}>
+
+
+                                <h2>
+                                    {category.title}
+                                </h2>
+
+
+
+                                <div className="movie-row">
+
+
+                                    {
+                                        category.movies.map(movie => (
+
+
+                                            <MovieCard
+
+                                                key={movie._id}
+
+                                                movie={movie}
+
+                                            />
+
+
+                                        ))
+                                    }
+
+
+                                </div>
+
+
+
+                            </section>
+
+
+                        )
+
+
+                    ))
+                }
+
+
 
             </div>
 
+
+
             <Footer />
+
 
         </>
 
     );
 
 }
+
 
 export default Home;

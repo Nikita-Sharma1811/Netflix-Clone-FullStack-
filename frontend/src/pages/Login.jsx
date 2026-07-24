@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import heroImage from "../assets/images/hero.jpg";
 
 function Login() {
 
@@ -56,7 +57,15 @@ function Login() {
 
     return (
 
-        <div className="login-container">
+        <div
+            className="login-container"
+            style={{
+                backgroundImage: `url(${heroImage})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+            }}
+        >
 
             <div className="login-box">
 

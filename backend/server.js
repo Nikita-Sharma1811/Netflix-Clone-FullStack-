@@ -10,7 +10,11 @@ const movieRoutes = require("./routes/movieRoutes");
 
 dotenv.config();
 
+
+console.log(process.env.JWT_SECRET);
 connectDB();
+
+const app = express();
 
 const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(",").map((url) => url.trim())

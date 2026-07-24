@@ -1,6 +1,9 @@
 const Movie = require("../models/Movie");
 
+// ======================
 // Add Movie
+// ======================
+
 const addMovie = async (req, res) => {
 
     try {
@@ -19,7 +22,10 @@ const addMovie = async (req, res) => {
 
 };
 
+// ======================
 // Get All Movies
+// ======================
+
 const getMovies = async (req, res) => {
 
     try {
@@ -38,7 +44,10 @@ const getMovies = async (req, res) => {
 
 };
 
-// Get Movie By ID
+// ======================
+// Get Single Movie
+// ======================
+
 const getMovie = async (req, res) => {
 
     try {
@@ -64,6 +73,11 @@ const getMovie = async (req, res) => {
     }
 
 };
+
+// ======================
+// Get Watchlist
+// ======================
+
 const getWatchlist = async (req, res) => {
 
     try {
@@ -88,19 +102,24 @@ const getWatchlist = async (req, res) => {
 
 };
 
+// ======================
 // Like Movie
+// ======================
+
 const likeMovie = async (req, res) => {
 
     try {
 
         const movie = await Movie.findById(req.params.id);
 
-        console.log(movie);
-
         if (!movie) {
+
             return res.status(404).json({
+
                 message: "Movie not found"
+
             });
+
         }
 
         movie.likes += 1;
@@ -111,7 +130,94 @@ const likeMovie = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
+        res.status(500).json({
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+// ======================
+// Add Review
+// ======================
+
+const addReview = async (req, res) => {
+
+    try {
+
+        const movie = await Movie.findById(req.params.id);
+
+        if (!movie) {
+
+            return res.status(404).json({
+
+                message: "Movie not found"
+
+            });
+
+        }
+
+        movie.reviews.push({
+
+            user: req.body.user,
+
+            comment: req.body.comment,
+
+            stars: Number(req.body.stars)
+
+        });
+
+        // Calculate Average Rating
+
+        const totalStars = movie.reviews.reduce(
+
+            (sum, review) => sum + Number(review.stars),
+
+            0
+
+        );
+
+        movie.rating = (
+
+            totalStars /
+
+            movie.reviews.length
+
+        ).toFixed(1);
+
+        await movie.save();
+
+        res.json(movie);
+
+    } catch (error) {
+
+        res.status(500).json({
+
+            message: error.message
+
+        });
+
+    }
+
+};
+// ======================
+// Delete Movie
+// ======================
+
+const deleteMovie = async (req, res) => {
+
+    try {
+
+        await Movie.findByIdAndDelete(req.params.id);
+
+        res.json({
+            message: "Movie Deleted Successfully"
+        });
+
+    } catch (error) {
 
         res.status(500).json({
             message: error.message
@@ -121,59 +227,10 @@ const likeMovie = async (req, res) => {
 
 };
 
-// Add Review
-// Add Review
-const addReview = async (req, res) => {
-    try {
-        console.log("Movie ID:", req.params.id);
-        console.log("Body:", req.body);
+// ======================
+// Add To Watchlist
+// ======================
 
-        const movie = await Movie.findById(req.params.id);
-
-        if (!movie) {
-            return res.status(404).json({
-                message: "Movie not found",
-            });
-        }
-
-        movie.reviews.push({
-            user: req.body.user,
-            comment: req.body.comment,
-            stars: req.body.stars,
-        });
-
-        await movie.save();
-
-        res.json(movie);
-
-    } catch (error) {
-        console.error("Add Review Error:", error);
-
-        res.status(500).json({
-            message: error.message,
-        });
-    }
-};
-// Delete Movie
-const deleteMovie = async (req, res) => {
-
-    try {
-
-        await Movie.findByIdAndDelete(req.params.id);
-
-        res.json({
-            message: "Movie Deleted Successfully",
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message,
-        });
-
-    }
-
-};
 const addToWatchlist = async (req, res) => {
 
     try {
@@ -183,15 +240,25 @@ const addToWatchlist = async (req, res) => {
         const movie = await Movie.findById(req.params.id);
 
         if (!movie) {
+
             return res.status(404).json({
                 message: "Movie Not Found"
             });
+
         }
 
-        if (movie.watchlistedBy.includes(userId)) {
+        const alreadyAdded = movie.watchlistedBy.some(
+
+            (id) => id.toString() === userId
+
+        );
+
+        if (alreadyAdded) {
+
             return res.status(400).json({
-                message: "Already in Watchlist"
+                message: "Movie already in Watchlist"
             });
+
         }
 
         movie.watchlistedBy.push(userId);
@@ -212,59 +279,72 @@ const addToWatchlist = async (req, res) => {
     }
 
 };
-const removeFromWatchlist = async (req,res)=>{
 
-    try{
+// ======================
+// Remove From Watchlist
+// ======================
 
-        const {userId,movieId}=req.params;
+const removeFromWatchlist = async (req, res) => {
 
-        console.log("User:", userId);
-        console.log("Movie:", movieId);
+    try {
 
+        const { userId, movieId } = req.params;
 
         const movie = await Movie.findById(movieId);
 
+        if (!movie) {
 
-        if(!movie){
             return res.status(404).json({
-                message:"Movie not found"
+                message: "Movie Not Found"
             });
+
         }
 
-
         movie.watchlistedBy = movie.watchlistedBy.filter(
-            id => id.toString() !== userId
-        );
 
+            (id) => id.toString() !== userId
+
+        );
 
         await movie.save();
 
-
         res.json({
-            message:"Removed from watchlist"
+            message: "Removed From Watchlist",
+            movie
         });
 
-
-    }
-    catch(error){
-
-        console.log("REMOVE ERROR:", error);
+    } catch (error) {
 
         res.status(500).json({
-            message:error.message
+            message: error.message
         });
 
     }
 
 };
+
+// ======================
+// Export Controllers
+// ======================
+
 module.exports = {
+
     addMovie,
+
     getMovies,
+
     getMovie,
+
     likeMovie,
+
     addReview,
+
     deleteMovie,
+
     addToWatchlist,
+
     getWatchlist,
+
     removeFromWatchlist
+
 };
